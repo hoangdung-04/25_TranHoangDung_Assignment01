@@ -1,0 +1,78 @@
+@model NewsArticleDto
+@{
+    ViewData["Title"] = Model.Headline;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <a asp-action="Index" class="btn btn-link text-decoration-none text-muted ps-0 mb-3">
+            <i class="bi bi-arrow-left me-1"></i> Back to News Portal
+        </a>
+
+        <article class="card border-0 shadow-sm overflow-hidden p-4 p-md-5 bg-white rounded-4">
+            <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+                <span class="badge bg-primary px-3 py-2 rounded-pill">
+                    <i class="bi bi-folder2-open me-1"></i>@(Model.CategoryName ?? "General News")
+                </span>
+                <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                    <i class="bi bi-shield-check me-1 text-success"></i>Verified Article
+                </span>
+            </div>
+
+            <h1 class="display-6 fw-bold tracking-tight text-dark mb-3">
+                @(string.IsNullOrEmpty(Model.NewsTitle) ? Model.Headline : Model.NewsTitle)
+            </h1>
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 py-3 border-top border-bottom text-muted small mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center rounded-circle fw-bold">
+                        @((Model.CreatedByName ?? "A")[0].ToString().ToUpper())
+                    </div>
+                    <div>
+                        <div class="fw-semibold text-dark">@(Model.CreatedByName ?? "Staff Author")</div>
+                        <div class="text-secondary">Journalist / Staff</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-4">
+                    <div>
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span>Published: @(Model.CreatedDate?.ToString("MMMM dd, yyyy") ?? "N/A")</span>
+                    </div>
+                    @if (Model.ModifiedDate.HasValue)
+                    {
+                        <div>
+                            <i class="bi bi-pencil-square me-1"></i>
+                            <span>Updated: @Model.ModifiedDate.Value.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="lead fw-semibold text-dark mb-4 bg-light p-3 rounded-3 border-start border-4 border-primary">
+                @Model.Headline
+            </div>
+
+            <div class="article-content text-dark mb-5" style="font-size: 1.1rem; line-height: 1.8; white-space: pre-line;">
+                @Model.NewsContent
+            </div>
+
+            <div class="p-3 bg-light rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-semibold text-muted small"><i class="bi bi-link-45deg me-1"></i>Source:</span>
+                    <span class="text-dark small">@(string.IsNullOrEmpty(Model.NewsSource) ? "FUNews Internal" : Model.NewsSource)</span>
+                </div>
+                
+                @if (Model.TagNames != null && Model.TagNames.Any())
+                {
+                    <div class="d-flex flex-wrap gap-1 align-items-center">
+                        <span class="text-muted small fw-semibold me-1"><i class="bi bi-tags me-1"></i>Tags:</span>
+                        @foreach (var tag in Model.TagNames)
+                        {
+                            <span class="badge bg-white text-secondary border small">#@tag</span>
+                        }
+                    </div>
+                }
+            </div>
+        </article>
+    </div>
+</div>

@@ -1,0 +1,211 @@
+@model List<NewsArticleDto>
+@{
+    ViewData["Title"] = "My News History";
+    var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    var tags = ViewBag.Tags as List<Tag> ?? new List<Tag>();
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="fw-bold tracking-tight text-dark mb-1">
+            <i class="bi bi-clock-history text-primary me-2"></i>My Publishing History
+        </h2>
+        <p class="text-muted small mb-0">Record of all news articles created by your staff account</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+        <i class="bi bi-file-earmark-text me-1"></i> All University News
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">ID</th>
+                    <th>Headline</th>
+                    <th>Category</th>
+                    <th>Created Date</th>
+                    <th>Status</th>
+                    <th>Tags</th>
+                    <th class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary"></i>
+                            You have not authored any news articles yet.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var art in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold text-secondary small">#@art.NewsArticleID</td>
+                            <td class="fw-bold text-dark" style="max-width: 320px;">
+                                <div class="text-truncate">@art.Headline</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 small">
+                                    @(art.CategoryName ?? "General")
+                                </span>
+                            </td>
+                            <td class="small text-secondary">
+                                <i class="bi bi-calendar3 me-1"></i>@(art.CreatedDate?.ToString("yyyy-MM-dd HH:mm") ?? "N/A")
+                            </td>
+                            <td>
+                                @if (art.NewsStatus == true)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small">
+                                        <i class="bi bi-check-circle me-1"></i>Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border rounded-pill px-2 py-1 small">
+                                        <i class="bi bi-x-circle me-1"></i>Inactive
+                                    </span>
+                                }
+                            </td>
+                            <td style="max-width: 200px;">
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if (art.TagNames != null && art.TagNames.Any())
+                                    {
+                                        @foreach (var t in art.TagNames.Take(2))
+                                        {
+                                            <span class="badge bg-light text-secondary border small">#@t</span>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-controller="Home" asp-action="Details" asp-route-id="@art.NewsArticleID" target="_blank"
+                                   class="btn btn-outline-secondary btn-sm rounded-pill px-3 me-1">
+                                    <i class="bi bi-eye me-1"></i> View
+                                </a>
+                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 btn-edit-news"
+                                        data-bs-toggle="modal" data-bs-target="#editNewsModal"
+                                        data-id="@art.NewsArticleID">
+                                    <i class="bi bi-pencil-square me-1"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Re-use Edit Modal for quick editing in history -->
+<div class="modal fade" id="editNewsModal" tabindex="-1" aria-labelledby="editNewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form method="post" id="editNewsForm" asp-action="Edit">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="/NewsArticles/History" />
+                <input type="hidden" name="NewsArticleID" id="editNewsArticleId" />
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="editNewsModalLabel">
+                        <i class="bi bi-pencil-square me-2 text-warning"></i>Update Article
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold text-secondary small">Article ID</label>
+                            <input type="text" id="editNewsArticleIdDisplay" class="form-control bg-light" readonly />
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold text-secondary small">Headline <span class="text-danger">*</span></label>
+                            <input type="text" name="Headline" id="editHeadline" class="form-control" required maxlength="150" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary small">News Title</label>
+                            <input type="text" name="NewsTitle" id="editNewsTitle" class="form-control" maxlength="400" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-secondary small">Category <span class="text-danger">*</span></label>
+                            <select name="CategoryID" id="editCategoryId" class="form-select" required>
+                                <option value="">-- Select Category --</option>
+                                @foreach (var c in categories)
+                                {
+                                    <option value="@c.CategoryID">@c.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold text-secondary small">News Source</label>
+                            <input type="text" name="NewsSource" id="editNewsSource" class="form-control" maxlength="400" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary small">Content <span class="text-danger">*</span></label>
+                            <textarea name="NewsContent" id="editNewsContent" class="form-control" rows="5" maxlength="4000"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-secondary small d-block">Tags</label>
+                            <div class="d-flex flex-wrap gap-2 p-2 bg-light rounded-3 border">
+                                @foreach (var tag in tags)
+                                {
+                                    <div class="form-check form-check-inline me-2">
+                                        <input class="form-check-input edit-tag-check" type="checkbox" name="TagIDs" value="@tag.TagID" id="editTag_@tag.TagID">
+                                        <label class="form-check-label small" for="editTag_@tag.TagID">@tag.TagName</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="NewsStatus" value="true" id="editNewsStatus">
+                                <label class="form-check-label fw-semibold text-dark small" for="editNewsStatus">Active (Publish to Public News Portal)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.btn-edit-news', function () {
+                var newsId = $(this).data('id');
+                $('#editNewsArticleId').val(newsId);
+                $('#editNewsArticleIdDisplay').val(newsId);
+                $('#editNewsForm').attr('action', '/NewsArticles/Edit/' + encodeURIComponent(newsId));
+
+                $.getJSON('/NewsArticles/GetNewsJson/' + encodeURIComponent(newsId), function (data) {
+                    if (data) {
+                        $('#editNewsArticleId').val(data.newsArticleID);
+                        $('#editNewsArticleIdDisplay').val(data.newsArticleID);
+                        $('#editHeadline').val(data.headline);
+                        $('#editNewsTitle').val(data.newsTitle || '');
+                        $('#editCategoryId').val(data.categoryID || '');
+                        $('#editNewsSource').val(data.newsSource || '');
+                        $('#editNewsContent').val(data.newsContent || '');
+                        $('#editNewsStatus').prop('checked', data.newsStatus === true);
+
+                        $('.edit-tag-check').prop('checked', false);
+                        if (data.tagIDs && data.tagIDs.length > 0) {
+                            data.tagIDs.forEach(function (tid) {
+                                $('#editTag_' + tid).prop('checked', true);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
