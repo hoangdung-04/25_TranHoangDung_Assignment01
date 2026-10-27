@@ -9,8 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add MVC services
 builder.Services.AddControllersWithViews();
 
-// Register HttpClient & ApiClient
-builder.Services.AddHttpClient<NewsApiClient>();
+// Register Services
+builder.Services.AddScoped<WordExportService>();
+
+// Register HttpContextAccessor & Token Handler
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<AuthTokenHandler>();
+
+// Register HttpClient & ApiClient with JWT Bearer Token handler
+builder.Services.AddHttpClient<NewsApiClient>()
+    .AddHttpMessageHandler<AuthTokenHandler>();
 
 // Add Session
 builder.Services.AddDistributedMemoryCache();
@@ -21,8 +29,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
     options.Cookie.Name = ".FUNews.Session";
 });
-
-builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

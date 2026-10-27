@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BusinessObjects;
 using BusinessObjects.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories.Interfaces;
 
@@ -10,6 +11,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class ReportsController : ControllerBase
     {
         private readonly INewsArticleRepository _newsArticleRepository;

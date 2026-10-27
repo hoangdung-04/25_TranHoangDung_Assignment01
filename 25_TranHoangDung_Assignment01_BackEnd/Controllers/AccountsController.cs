@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using BusinessObjects;
 using BusinessObjects.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -11,6 +12,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class AccountsController : ODataController
     {
         private readonly ISystemAccountRepository _accountRepository;
@@ -21,6 +23,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         [EnableQuery]
         public IActionResult Get([FromQuery] string? search, [FromQuery] int? role)
         {
@@ -29,6 +32,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetById(short id)
         {
             var account = _accountRepository.GetAccountById(id);
@@ -40,6 +44,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("CheckDelete/{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult CheckDelete(short id)
         {
             var account = _accountRepository.GetAccountById(id);
@@ -59,6 +64,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create([FromBody] AccountCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -86,6 +92,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Update(short id, [FromBody] AccountUpdateDto dto)
         {
             if (id != dto.AccountID)
@@ -119,6 +126,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPut("Profile/{id}")]
+        [Authorize(Roles = "Admin,Staff,Lecturer")]
         public IActionResult UpdateProfile(short id, [FromBody] UserProfileDto dto)
         {
             if (id != dto.AccountID)
@@ -150,6 +158,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(short id)
         {
             try

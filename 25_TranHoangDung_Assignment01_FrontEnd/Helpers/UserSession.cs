@@ -9,6 +9,7 @@ namespace _25_TranHoangDung_Assignment01_FrontEnd.Helpers
         public string AccountEmail { get; set; } = string.Empty;
         public int Role { get; set; } // 0: Admin, 1: Staff, 2: Lecturer
         public string RoleName { get; set; } = string.Empty;
+        public string? Token { get; set; }
         public bool IsLoggedIn => !string.IsNullOrEmpty(AccountEmail);
         public bool IsAdmin => Role == 0;
         public bool IsStaff => Role == 1;
@@ -28,7 +29,8 @@ namespace _25_TranHoangDung_Assignment01_FrontEnd.Helpers
                 AccountName = session.GetString("UserName") ?? "User",
                 AccountEmail = email,
                 Role = session.GetInt32("UserRole") ?? 2,
-                RoleName = session.GetString("RoleName") ?? "User"
+                RoleName = session.GetString("RoleName") ?? "User",
+                Token = session.GetString("JwtToken")
             };
         }
 
@@ -40,6 +42,10 @@ namespace _25_TranHoangDung_Assignment01_FrontEnd.Helpers
             session.SetString("UserEmail", AccountEmail);
             session.SetInt32("UserRole", Role);
             session.SetString("RoleName", RoleName);
+            if (!string.IsNullOrEmpty(Token))
+            {
+                session.SetString("JwtToken", Token);
+            }
         }
 
         public static void ClearSession(HttpContext context)

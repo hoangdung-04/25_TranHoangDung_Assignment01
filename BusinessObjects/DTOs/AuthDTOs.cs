@@ -16,6 +16,7 @@ namespace BusinessObjects.DTOs
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        public string? Token { get; set; }
         public short AccountID { get; set; }
         public string AccountName { get; set; } = string.Empty;
         public string AccountEmail { get; set; } = string.Empty;

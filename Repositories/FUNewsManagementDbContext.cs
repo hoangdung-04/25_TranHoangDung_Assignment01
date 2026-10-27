@@ -29,7 +29,10 @@ namespace Repositories
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
             var config = builder.Build();
-            var connStr = config.GetConnectionString("FUNewsManagementDB");
+            var connStr = config.GetConnectionString("MyCNN")
+                       ?? config.GetConnectionString("MyCnn")
+                       ?? config.GetConnectionString("Mycnn")
+                       ?? config.GetConnectionString("FUNewsManagementDB");
 
             if (string.IsNullOrEmpty(connStr))
             {

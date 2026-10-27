@@ -13,8 +13,11 @@
         <p class="text-muted small mb-0">Statistical analytics and report generation based on news created date period</p>
     </div>
     <div class="d-flex gap-2">
+        <a asp-action="ExportToWord" asp-route-startDate="@startDate" asp-route-endDate="@endDate" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-print-none">
+            <i class="bi bi-file-earmark-word-fill me-1"></i> Export to Word (.docx)
+        </a>
         <button type="button" onclick="window.print()" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-print-none">
-            <i class="bi bi-printer me-1"></i> Print / Export Report
+            <i class="bi bi-printer me-1"></i> Print
         </button>
     </div>
 </div>

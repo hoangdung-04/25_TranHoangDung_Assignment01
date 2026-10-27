@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using BusinessObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -20,6 +21,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [EnableQuery]
         public IActionResult Get()
         {
@@ -28,6 +30,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public IActionResult GetById(int id)
         {
             var tag = _tagRepository.GetTagById(id);
@@ -39,6 +42,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff,Admin")]
         public IActionResult Create([FromBody] Tag tag)
         {
             if (!ModelState.IsValid)

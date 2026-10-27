@@ -49,7 +49,8 @@ namespace _25_TranHoangDung_Assignment01_FrontEnd.Controllers
                 AccountName = result.AccountName,
                 AccountEmail = result.AccountEmail,
                 Role = result.Role,
-                RoleName = result.RoleName
+                RoleName = result.RoleName,
+                Token = result.Token
             };
             session.SaveToSession(HttpContext);
 

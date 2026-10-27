@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BusinessObjects;
 using BusinessObjects.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -44,6 +45,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Staff,Admin")]
         [EnableQuery]
         public IActionResult Get([FromQuery] bool? status, [FromQuery] string? search, [FromQuery] short? categoryId, [FromQuery] short? createdById)
         {
@@ -53,6 +55,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("Active")]
+        [AllowAnonymous]
         public IActionResult GetActive([FromQuery] string? search, [FromQuery] short? categoryId)
         {
             // Public endpoint: active news only
@@ -62,6 +65,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public IActionResult GetById(string id)
         {
             var article = _newsArticleRepository.GetNewsArticleById(id);
@@ -73,6 +77,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpGet("History/{creatorId}")]
+        [Authorize(Roles = "Staff,Admin")]
         public IActionResult GetHistory(short creatorId)
         {
             var articles = _newsArticleRepository.GetNewsArticles(createdById: creatorId);
@@ -81,6 +86,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff,Admin")]
         public IActionResult Create([FromBody] NewsArticleCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -115,6 +121,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Staff,Admin")]
         public IActionResult Update(string id, [FromBody] NewsArticleUpdateDto dto)
         {
             if (id != dto.NewsArticleID)
@@ -152,6 +159,7 @@ namespace _25_TranHoangDung_Assignment01_BackEnd.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Staff,Admin")]
         public IActionResult Delete(string id)
         {
             try
